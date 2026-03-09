@@ -79,26 +79,26 @@
   </head>
   <body>
     <div class="toolbar">
-      <button id="zoom-out" title="缩小">➖</button>
-      <button id="zoom-in" title="放大">➕</button>
-      <button id="fit" title="适应画布">🎯</button>
-      <button id="open-window" title="打开预览窗口">⛶</button>
-      <button id="export-png" class="primary" title="导出为PNG图片">
+      <button id="zoom-out" title="Zoom Out">➖</button>
+      <button id="zoom-in" title="Zoom In">➕</button>
+      <button id="fit" title="Fit to Canvas">🎯</button>
+      <button id="open-window" title="Open Preview Window">⛶</button>
+      <button id="export-png" class="primary" title="Export as PNG">
         📷 PNG
       </button>
-      <button id="export-opml" class="primary" title="导出为OPML大纲">
+      <button id="export-opml" class="primary" title="Export as OPML">
         📄 OPML
       </button>
     </div>
     <div id="mindmap-container">
-      <div class="loading">正在加载思维导图...</div>
+      <div class="loading">Loading mind map...</div>
     </div>
 
     <script>
       let markmap = null;
       let currentMarkdown = "";
 
-      // 初始化思维导图
+      // 初始化Mind Map
       function initMindmap(markdown) {
         currentMarkdown = markdown;
         const container = document.getElementById("mindmap-container");
@@ -132,11 +132,11 @@
             root,
           );
 
-          console.log("[AI-Butler Mindmap] 渲染成功");
+          console.log("[AI-Butler Mindmap] Rendered successfully");
         } catch (err) {
-          console.error("[AI-Butler Mindmap] 渲染失败:", err);
+          console.error("[AI-Butler Mindmap] Render failed:", err);
           container.innerHTML =
-            '<div class="error">渲染失败: ' + err.message + "</div>";
+            '<div class="error">Render failed: ' + err.message + "</div>";
         }
       }
 
@@ -209,7 +209,7 @@
           if (!markmap) return;
 
           const exportBtn = document.getElementById("export-png");
-          exportBtn.textContent = "⏳ 导出中...";
+          exportBtn.textContent = "⏳ Exporting...";
           exportBtn.disabled = true;
 
           try {
@@ -338,7 +338,7 @@
           if (!currentMarkdown) return;
 
           const exportBtn = document.getElementById("export-opml");
-          exportBtn.textContent = "⏳ 导出中...";
+          exportBtn.textContent = "⏳ Exporting...";
           exportBtn.disabled = true;
 
           try {
@@ -372,7 +372,7 @@
         let opml = `<?xml version="1.0" encoding="UTF-8"?>
 <opml version="2.0">
   <head>
-    <title>思维导图</title>
+    <title>Mind Map</title>
     <dateCreated>${new Date().toISOString()}</dateCreated>
   </head>
   <body>

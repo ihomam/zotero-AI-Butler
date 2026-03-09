@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>一图总结</title>
+    <title>Image Summary</title>
     <style>
       html,
       body {
@@ -61,7 +61,7 @@
   </head>
   <body>
     <div id="root">
-      <img id="img" alt="一图总结" />
+      <img id="img" alt="Image Summary" />
       <div id="error" style="display: none"></div>
     </div>
     <div id="hint">Click to close, or press Esc</div>
@@ -80,7 +80,7 @@
         const title =
           (args && args.title ? String(args.title) : "") ||
           (window.__aiButlerTitle ? String(window.__aiButlerTitle) : "") ||
-          "一图总结";
+          "Image Summary";
         const src =
           (args && args.imageDataUri ? String(args.imageDataUri) : "") ||
           (window.__aiButlerImageDataUri

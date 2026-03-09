@@ -274,9 +274,9 @@ function initializeDefaultPrefsOnStartup() {
 }
 
 /**
- * 统一打开 AI 管家仪表盘
+ * 统一打开 AI Butler Dashboard
  *
- * 工具栏 🤖 与右键菜单“AI 管家仪表盘”必须共用同一入口，
+ * 工具栏 🤖 与右键菜单“AI Butler Dashboard”必须共用同一入口，
  * 避免不同入口落到不同面板或不同状态上下文。
  */
 async function openAIButlerDashboardFromUnifiedEntry(): Promise<void> {
@@ -351,10 +351,10 @@ function registerContextMenuItem() {
     },
   });
 
-  // 注册"AI 管家仪表盘"菜单项
+  // 注册"AI Butler Dashboard"菜单项
   ztoolkit.Menu.register("item", {
     tag: "menuitem",
-    label: "AI 管家仪表盘",
+    label: "AI Butler Dashboard",
     icon: menuIcon,
 
     commandListener: async (ev) => {
@@ -474,7 +474,7 @@ function registerContextMenuItem() {
  * 技术实现:
  * - 在 onMainWindowLoad 时创建按钮并添加到工具栏
  * - 使用唯一 ID 防止重复创建
- * - 点击后打开 AI 管家仪表盘
+ * - 点击后打开 AI Butler Dashboard
  */
 function registerLibraryToolbarButton(win: Window) {
   try {

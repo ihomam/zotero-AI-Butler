@@ -1,33 +1,33 @@
 /**
  * ================================================================
- * 一图总结笔记生成器模块
+ * Image Summary笔记生成器模块
  * ================================================================
  *
- * 本模块负责将 AI 生成的学术概念海报图片插入 Zotero 笔记
+ * 本模块负责将 AI 生成的Academic concept poster图片插入 Zotero 笔记
  *
  * 主要职责:
  * 1. 将 Base64 编码的图片嵌入 Zotero 笔记
- * 2. 创建独立的"一图总结"笔记条目
- * 3. 管理已存在的一图总结笔记(避免重复)
+ * 2. 创建独立的"Image Summary"笔记条目
+ * 3. 管理已存在的Image Summary笔记(避免重复)
  *
  * @module imageNoteGenerator
  * @author AI-Butler Team
  */
 
 /**
- * 一图总结笔记生成器类
+ * Image Summary笔记生成器类
  *
  * 提供静态方法集合，封装图片笔记生成的核心逻辑
  */
 export class ImageNoteGenerator {
-  /** 一图总结笔记的标识标签 */
+  /** Image Summary笔记的标识标签 */
   private static readonly IMAGE_NOTE_TAG = "AI-Image-Summary";
 
-  /** 一图总结笔记标题前缀 */
-  private static readonly NOTE_TITLE_PREFIX = "AI 管家一图总结 - ";
+  /** Image Summary笔记标题前缀 */
+  private static readonly NOTE_TITLE_PREFIX = "AI Butler Image Summary - ";
 
   /**
-   * 创建一图总结笔记
+   * 创建Image Summary笔记
    *
    * 使用 Zotero 官方 API 将图片作为独立附件存储，笔记中只保留引用
    * 这样可以大幅减小笔记大小，解决 WebDAV 同步限制问题
@@ -44,7 +44,7 @@ export class ImageNoteGenerator {
   ): Promise<Zotero.Item> {
     const itemTitle = item.getField("title") as string;
 
-    // 检查是否已存在一图总结笔记
+    // 检查是否已存在Image Summary笔记
     let note = await this.findExistingImageNote(item);
     const isUpdate = !!note;
 
@@ -53,10 +53,10 @@ export class ImageNoteGenerator {
       note = new Zotero.Item("note");
       note.libraryID = item.libraryID;
       note.parentID = item.id;
-      note.setNote("<p>正在生成一图总结...</p>");
+      note.setNote("<p>Generating image summary...</p>");
       note.addTag(this.IMAGE_NOTE_TAG);
       await note.saveTx();
-      ztoolkit.log(`[AI-Butler] 创建新的一图总结笔记: ${note.id}`);
+      ztoolkit.log(`[AI-Butler] 创建新的Image Summary笔记: ${note.id}`);
     }
 
     // 将 base64 转换为 Blob
@@ -84,7 +84,7 @@ export class ImageNoteGenerator {
     await note.saveTx();
 
     ztoolkit.log(
-      `[AI-Butler] ${isUpdate ? "更新" : "创建"}一图总结笔记完成: ${note.id}`,
+      `[AI-Butler] ${isUpdate ? "更新" : "创建"}Image Summary笔记完成: ${note.id}`,
     );
     return note;
   }
@@ -127,15 +127,15 @@ export class ImageNoteGenerator {
     // 构建笔记 HTML，使用 data-attachment-key 引用图片
     return `<h2>${this.NOTE_TITLE_PREFIX}${this.escapeHtml(truncatedTitle)}</h2>
 <div style="text-align: center; padding: 10px;">
-  <img data-attachment-key="${attachmentKey}" alt="学术概念海报" style="max-width: 100%; height: auto;" />
+  <img data-attachment-key="${attachmentKey}" alt="Academic concept poster" style="max-width: 100%; height: auto;" />
 </div>
 <p style="text-align: center; color: #666; font-size: 12px;">
-  由 AI 管家自动生成的学术概念海报
+  由 AI 管家自动生成的Academic concept poster
 </p>`;
   }
 
   /**
-   * 使用本地文件路径创建一图总结笔记 (测试用)
+   * 使用本地文件路径创建Image Summary笔记 (测试用)
    *
    * 读取本地图片文件并转换为 Base64 后创建笔记
    *
@@ -174,15 +174,15 @@ export class ImageNoteGenerator {
 
       return this.createImageNote(item, base64, mimeType);
     } catch (error: any) {
-      ztoolkit.log(`[AI-Butler] 从文件创建一图总结笔记失败:`, error);
+      ztoolkit.log(`[AI-Butler] 从文件创建Image Summary笔记失败:`, error);
       throw new Error(`读取图片文件失败: ${error.message || error}`);
     }
   }
 
   /**
-   * 查找已有的一图总结笔记
+   * 查找已有的Image Summary笔记
    *
-   * 通过标签或标题标识查找文献条目下已存在的一图总结笔记
+   * 通过标签或标题标识查找文献条目下已存在的Image Summary笔记
    *
    * @param item Zotero 文献条目对象
    * @returns 找到的笔记对象，如果不存在则返回 null
@@ -192,42 +192,44 @@ export class ImageNoteGenerator {
   ): Promise<Zotero.Item | null> {
     try {
       const noteIDs = (item as any).getNotes?.() || [];
-      ztoolkit.log(`[AI-Butler] 查找一图总结笔记，共 ${noteIDs.length} 个笔记`);
+      ztoolkit.log(
+        `[AI-Butler] 查找Image Summary笔记，共 ${noteIDs.length} 个笔记`,
+      );
 
       for (const nid of noteIDs) {
         const n = await Zotero.Items.getAsync(nid);
         if (!n) continue;
 
-        // 检查是否有一图总结标签
+        // 检查是否有Image Summary标签
         const tags: Array<{ tag: string }> = (n as any).getTags?.() || [];
         const hasTag = tags.some((t) => t.tag === this.IMAGE_NOTE_TAG);
 
         // 检查标题是否匹配 (多种模式)
         const noteHtml: string = (n as any).getNote?.() || "";
 
-        // 模式1: 精确匹配 "AI 管家一图总结 -"
+        // 模式1: 精确匹配 "AI 管家Image Summary -"
         const titleMatch1 = new RegExp(
           `<h2>\\s*${this.escapeRegExp(this.NOTE_TITLE_PREFIX)}`,
         ).test(noteHtml);
 
-        // 模式2: 宽松匹配 "一图总结"
-        const titleMatch2 = /<h2>[^<]*一图总结[^<]*<\/h2>/i.test(noteHtml);
+        // 模式2: 宽松匹配 "Image Summary"
+        const titleMatch2 = /<h2>[^<]*Image Summary[^<]*<\/h2>/i.test(noteHtml);
 
-        // 模式3: 匹配标题中包含 "AI 管家一图总结"
-        const titleMatch3 = noteHtml.includes("AI 管家一图总结");
+        // 模式3: 匹配标题中包含 "AI 管家Image Summary"
+        const titleMatch3 = noteHtml.includes("AI 管家Image Summary");
 
         if (hasTag || titleMatch1 || titleMatch2 || titleMatch3) {
           ztoolkit.log(
-            `[AI-Butler] 找到一图总结笔记: ID=${nid}, hasTag=${hasTag}, titleMatch1=${titleMatch1}, titleMatch2=${titleMatch2}, titleMatch3=${titleMatch3}`,
+            `[AI-Butler] 找到Image Summary笔记: ID=${nid}, hasTag=${hasTag}, titleMatch1=${titleMatch1}, titleMatch2=${titleMatch2}, titleMatch3=${titleMatch3}`,
           );
           return n as Zotero.Item;
         }
       }
 
-      ztoolkit.log(`[AI-Butler] 未找到一图总结笔记`);
+      ztoolkit.log(`[AI-Butler] 未找到Image Summary笔记`);
       return null;
     } catch (error) {
-      ztoolkit.log(`[AI-Butler] 查找一图总结笔记失败:`, error);
+      ztoolkit.log(`[AI-Butler] 查找Image Summary笔记失败:`, error);
       return null;
     }
   }
@@ -414,10 +416,10 @@ export class ImageNoteGenerator {
     // 使用简单的 HTML 结构，确保 Zotero 兼容性
     return `<h2>${this.NOTE_TITLE_PREFIX}${this.escapeHtml(truncatedTitle)}</h2>
 <div style="text-align: center; padding: 10px;">
-  <img src="${imageDataUri}" alt="学术概念海报" style="max-width: 100%; height: auto;" />
+  <img src="${imageDataUri}" alt="Academic concept poster" style="max-width: 100%; height: auto;" />
 </div>
 <p style="text-align: center; color: #666; font-size: 12px;">
-  由 AI 管家自动生成的学术概念海报
+  由 AI 管家自动生成的Academic concept poster
 </p>`;
   }
 
