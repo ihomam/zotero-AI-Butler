@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>思维导图</title>
+    <title>Mind Map</title>
     <style>
       html,
       body {
@@ -58,7 +58,7 @@
         const title =
           (args && args.title ? String(args.title) : "") ||
           (window.__aiButlerTitle ? String(window.__aiButlerTitle) : "") ||
-          "思维导图";
+          "Mind Map";
         const markdown =
           (args && args.markdown ? String(args.markdown) : "") ||
           (window.__aiButlerMindmapMarkdown
@@ -81,7 +81,7 @@
 
         if (!markdown) {
           errorEl.style.display = "block";
-          errorEl.textContent = "未提供思维导图内容。";
+          errorEl.textContent = "No mind map content was provided.";
           return;
         }
 
@@ -162,7 +162,7 @@
             await IOUtils.write(filePath, encoder.encode(content));
           }
 
-          notify("思维导图已导出", `已保存到: ${filePath}`, "success");
+          notify("Mind map exported", `Saved to: ${filePath}`, "success");
           try {
             Zotero.launchFile(filePath);
           } catch (e) {}
@@ -179,13 +179,13 @@
               );
             } catch (e) {
               errorEl.style.display = "block";
-              errorEl.textContent = "发送思维导图数据失败。";
+              errorEl.textContent = "Failed to send mind map data.";
             }
           }
 
           if (event.data.type === "export-mindmap") {
             saveExport(event.data).catch((e) => {
-              notify("导出失败", `错误: ${e}`, "error");
+              notify("Export failed", `Error: ${e}`, "error");
             });
           }
         });

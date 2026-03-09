@@ -90,7 +90,7 @@ export class LibraryScannerView extends BaseView {
             margin: "0 0 10px 0",
             fontSize: "18px",
           },
-          innerHTML: "📚 库扫描结果",
+          innerHTML: "📚 Library Scan Results",
         }),
         this.createElement("p", {
           id: "scanner-info",
@@ -99,7 +99,7 @@ export class LibraryScannerView extends BaseView {
             fontSize: "14px",
             opacity: "0.9",
           },
-          innerHTML: "正在扫描...",
+          innerHTML: "Scanning...",
         }),
       ],
     });
@@ -135,7 +135,7 @@ export class LibraryScannerView extends BaseView {
         fontSize: "14px",
         color: "#666",
       },
-      innerHTML: "已选择: <strong>0</strong> 篇",
+      innerHTML: "Selected: <strong>0</strong> papers",
     });
 
     // 按钮容器
@@ -156,7 +156,7 @@ export class LibraryScannerView extends BaseView {
         cursor: "pointer",
         fontSize: "14px",
       },
-      textContent: "返回",
+      textContent: "Back",
     }) as HTMLButtonElement;
 
     cancelButton.addEventListener("click", () => {
@@ -176,7 +176,7 @@ export class LibraryScannerView extends BaseView {
         fontSize: "14px",
         fontWeight: "600",
       },
-      textContent: "添加到队列",
+      textContent: "Add to Queue",
     }) as HTMLButtonElement;
 
     confirmButton.addEventListener("click", () => {
@@ -249,7 +249,7 @@ export class LibraryScannerView extends BaseView {
         const unfiledNode: TreeNode = {
           id: `unfiled-${library.libraryID}`,
           type: "collection",
-          name: "未分类文献",
+          name: "Unfiled Papers",
           children: [],
           checked: false,
           expanded: false, // 默认收起
@@ -311,7 +311,7 @@ export class LibraryScannerView extends BaseView {
       }
     }
 
-    // 如果这个收藏夹没有未处理的子项,返回 null
+    // 如果这个收藏夹没有未处理的子项,Back null
     if (node.children.length === 0) {
       return null;
     }
@@ -384,7 +384,7 @@ export class LibraryScannerView extends BaseView {
         if (tags.some((t) => t.tag === "AI-Generated")) return true;
 
         const noteHtml: string = (n as any).getNote?.() || "";
-        if (/<h2>\s*AI 管家\s*-/.test(noteHtml)) return true;
+        if (/<h2>\s*AI Butler\s*-/.test(noteHtml)) return true;
       }
       return false;
     } catch {
@@ -400,9 +400,9 @@ export class LibraryScannerView extends BaseView {
     const infoElement = this.container?.querySelector("#scanner-info");
     if (infoElement) {
       if (this.totalUnprocessed === 0) {
-        infoElement.innerHTML = "🎉 所有文献都已分析完成!";
+        infoElement.innerHTML = "🎉 All papers have already been analyzed!";
       } else {
-        infoElement.innerHTML = `发现 <strong>${this.totalUnprocessed}</strong> 篇文献未进行 AI 分析`;
+        infoElement.innerHTML = `Found <strong>${this.totalUnprocessed}</strong> papers without AI analysis`;
       }
     }
 
@@ -417,7 +417,7 @@ export class LibraryScannerView extends BaseView {
             color: "#999",
             fontSize: "16px",
           },
-          innerHTML: "🎉<br><br>所有文献都已分析完成!",
+          innerHTML: "🎉<br><br>All papers have already been analyzed!",
         });
         this.treeContainer.appendChild(emptyMessage);
       } else {
@@ -484,7 +484,7 @@ export class LibraryScannerView extends BaseView {
         fontWeight: "600",
         color: "#fff",
       },
-      innerHTML: `📚 全选/全不选 (共 ${this.totalUnprocessed} 篇未分析)`,
+      innerHTML: `📚 Select/Deselect All (${this.totalUnprocessed} unanalyzed papers)`,
     });
 
     content.appendChild(checkbox);
@@ -916,7 +916,7 @@ export class LibraryScannerView extends BaseView {
   private updateSelectedCount(): void {
     this.selectedCount = this.countSelectedItems(this.treeRoot);
     if (this.selectedCountElement) {
-      this.selectedCountElement.innerHTML = `已选择: <strong>${this.selectedCount}</strong> 篇`;
+      this.selectedCountElement.innerHTML = `Selected: <strong>${this.selectedCount}</strong> papers`;
     }
 
     // 更新按钮状态
@@ -952,20 +952,23 @@ export class LibraryScannerView extends BaseView {
     const selectedItems = this.collectSelectedItems(this.treeRoot);
 
     if (selectedItems.length === 0) {
-      new ztoolkit.ProgressWindow("AI 管家")
-        .createLine({ text: "请先选择要分析的文献", type: "default" })
+      new ztoolkit.ProgressWindow("AI Butler")
+        .createLine({
+          text: "Please select papers to analyze first",
+          type: "default",
+        })
         .show();
       return;
     }
 
-    // 批量添加到队列
+    // 批量Add to Queue
     for (const item of selectedItems) {
       this.taskQueueManager.addTask(item, false);
     }
 
-    new ztoolkit.ProgressWindow("AI 管家")
+    new ztoolkit.ProgressWindow("AI Butler")
       .createLine({
-        text: `✅ 已将 ${selectedItems.length} 篇文献添加到队列`,
+        text: `✅ Added ${selectedItems.length} papers to the queue`,
         type: "success",
       })
       .show();

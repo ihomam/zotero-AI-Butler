@@ -6,7 +6,7 @@
  * 本模块是插件的核心功能实现,负责协调 PDF 提取、AI 分析和笔记创建的完整流程
  *
  * 主要职责:
- * 1. 统筹论文总结生成的完整工作流
+ * 1. 统筹论文summarize生成的完整工作流
  * 2. 协调 PDF 文本提取和 AI 模型调用
  * 3. 管理流式输出和用户界面更新
  * 4. 处理批量文献的队列执行
@@ -48,14 +48,14 @@ import {
  */
 export class NoteGenerator {
   /**
-   * 为单个文献条目生成 AI 总结笔记
+   * 为单个文献条目生成 AI summarize笔记
    *
    * 这是单条目处理的核心函数,协调整个生成流程
    *
    * 执行流程:
    * 1. 从文献条目提取 PDF 文本
    * 2. 清理和预处理文本内容
-   * 3. 调用 AI 模型生成总结
+   * 3. 调用 AI 模型生成summarize
    * 4. 将 Markdown 格式转换为 Zotero 笔记格式
    * 5. 创建笔记并关联到文献条目
    *
@@ -96,7 +96,7 @@ export class NoteGenerator {
       // 如果不是强制覆盖，且已存在笔记，则检查策略
       if (existing && !options?.forceOverwrite) {
         if (policy === "skip") {
-          progressCallback?.("已存在AI笔记，跳过", 100);
+          progressCallback?.("AI note already exists, skipping", 100);
           return {
             note: existing as Zotero.Item,
             content: ((existing as any).getNote?.() as string) || "",
@@ -105,7 +105,7 @@ export class NoteGenerator {
       }
 
       // 步骤 1: PDF 处理
-      progressCallback?.("正在处理PDF...", 10);
+      progressCallback?.("Processing PDF...", 10);
 
       // 检查 PDF 文件大小限制
       const enableSizeLimit =
@@ -144,7 +144,7 @@ export class NoteGenerator {
           if (supportsMultiFile) {
             useMultiPdfMode = true;
             progressCallback?.(
-              `使用多 PDF 模式 (${allPdfs.length} 个文件)...`,
+              `Using multi-PDF mode (${allPdfs.length} files)...`,
               15,
             );
           } else {
@@ -155,7 +155,7 @@ export class NoteGenerator {
                 closeTime: 3000,
               })
                 .createLine({
-                  text: "当前 API 不支持多 PDF 上传，已使用默认 PDF",
+                  text: "The current API does not support multi-PDF uploads, so the default PDF was used instead.",
                   type: "warning",
                 })
                 .show();
@@ -185,8 +185,8 @@ export class NoteGenerator {
         isBase64 = true;
       }
 
-      // 步骤 2: AI 模型总结生成
-      // 读取总结模式配置 - 优先使用传入的 options.summaryMode
+      // 步骤 2: AI 模型summarize生成
+      // 读取summarize模式配置 - 优先使用传入的 options.summaryMode
       const summaryMode = (options?.summaryMode ||
         (getPref("summaryMode" as any) as string) ||
         "single") as SummaryMode;
@@ -194,20 +194,20 @@ export class NoteGenerator {
       // 通知进度回调开始 AI 分析 (40% 完成)
       progressCallback?.(
         summaryMode === "single"
-          ? "正在生成AI总结..."
-          : `正在进行多轮对话分析 (模式: ${summaryMode === "multi_concat" ? "拼接" : "总结"})...`,
+          ? "Generating AI summary..."
+          : `Running multi-round analysis (mode: ${summaryMode === "multi_concat" ? "concatenate" : "summarize"})...`,
         40,
       );
 
       // 如果有输出窗口,开始显示当前处理的条目
       if (outputWindow) {
         // 先显示加载状态
-        outputWindow.showLoadingState(`正在分析「${itemTitle}」`);
+        outputWindow.showLoadingState(`Analyzing “${itemTitle}”`);
       }
 
-      // 根据总结模式选择不同的生成策略
+      // 根据summarize模式选择不同的生成策略
       if (summaryMode === "single") {
-        // 单次对话模式：使用传统的单次总结
+        // 单次对话模式：使用传统的单次summarize
         // 定义流式输出回调函数
         const onProgress = async (chunk: string) => {
           fullContent += chunk;
@@ -286,7 +286,7 @@ export class NoteGenerator {
 
       // 步骤 3: 创建/更新笔记
       // 通知进度回调开始创建笔记 (80% 完成)
-      progressCallback?.("正在创建笔记...", 80);
+      progressCallback?.("Creating note...", 80);
 
       // 检查内容是否为空，防止创建空笔记
       if (!fullContent || !fullContent.trim()) {
@@ -297,7 +297,7 @@ export class NoteGenerator {
       const noteContent = this.formatNoteContent(
         itemTitle,
         fullContent,
-        "AI 总结",
+        "AI summarize",
       );
 
       if (existing) {
@@ -322,7 +322,7 @@ export class NoteGenerator {
       }
 
       // 通知进度回调完成 (100%)
-      progressCallback?.("完成！", 100);
+      progressCallback?.("Completed!", 100);
 
       // 异步并行填表（不阻塞笔记返回）
       const enableTable =
@@ -423,15 +423,15 @@ export class NoteGenerator {
   /**
    * 格式化笔记内容
    *
-   * 为 AI 生成的总结添加标题头部,并转换为 Zotero 笔记兼容的 HTML 格式
+   * 为 AI 生成的summarize添加标题头部,并转换为 Zotero 笔记兼容的 HTML 格式
    *
    * 处理步骤:
-   * 1. 将 Markdown 格式的总结转换为 HTML
+   * 1. 将 Markdown 格式的summarize转换为 HTML
    * 2. 添加文献标题作为笔记标题 (并限制长度)
    * 3. 包装成完整的笔记结构
    *
    * @param itemTitle 文献条目标题
-   * @param summary AI 生成的总结内容 (Markdown 格式)
+   * @param summary AI 生成的summarize内容 (Markdown 格式)
    * @returns 格式化后的 HTML 内容,可直接保存到 Zotero 笔记
    *
    * @example
@@ -630,7 +630,7 @@ export class NoteGenerator {
    * ```typescript
    * const note = await createNote(
    *   parentItem,
-   *   "<h2>总结</h2><p>这是AI生成的内容</p>"
+   *   "<h2>summarize</h2><p>这是AI生成的内容</p>"
    * );
    * console.log(note.id); // 新创建的笔记 ID
    * ```
@@ -663,13 +663,13 @@ export class NoteGenerator {
    * 执行多轮对话并生成内容
    *
    * 根据配置的多轮提示词依次进行对话，支持两种模式：
-   * - multi_concat: 将所有对话内容拼接（最详细）
-   * - multi_summarize: 基于对话生成最终总结（均衡）
+   * - multi_concat: 将所有对话内容concatenate（最详细）
+   * - multi_summarize: 基于对话生成最终summarize（均衡）
    *
    * @param pdfContent PDF内容（Base64或文本）
    * @param isBase64 是否为Base64编码
    * @param itemTitle 文献标题
-   * @param mode 总结模式
+   * @param mode summarize模式
    * @param outputWindow 输出窗口
    * @param progressCallback 进度回调
    * @param streamCallback 流式输出回调
@@ -706,7 +706,7 @@ export class NoteGenerator {
     if (outputWindow) {
       outputWindow.startItem(itemTitle);
       outputWindow.appendContent(
-        `**[多轮对话模式: ${mode === "multi_concat" ? "拼接" : "总结"}]**\n\n`,
+        `**[多轮对话模式: ${mode === "multi_concat" ? "concatenate" : "summarize"}]**\n\n`,
       );
     }
 
@@ -791,24 +791,24 @@ export class NoteGenerator {
 
     // 根据模式生成最终内容
     if (mode === "multi_concat") {
-      // 拼接模式：直接拼接所有问答
+      // concatenate模式：直接concatenate所有问答
       return this.formatMultiRoundConcat(roundResults);
     } else {
-      // 总结模式：基于所有对话进行最终总结
-      progressCallback?.("正在生成最终总结...", 85);
+      // summarize模式：基于所有对话进行最终summarize
+      progressCallback?.("正在生成最终summarize...", 85);
 
       if (outputWindow) {
-        outputWindow.appendContent("\n## 📝 最终总结\n\n");
+        outputWindow.appendContent("\n## 📝 最终summarize\n\n");
       }
 
-      // 读取最终总结提示词
+      // 读取最终summarize提示词
       const finalPromptConfig = getPref(
         "multiRoundFinalPrompt" as any,
       ) as string;
       const finalPrompt =
         finalPromptConfig?.trim() || getDefaultMultiRoundFinalPrompt();
 
-      // 将最终总结提示词加入对话
+      // 将最终summarize提示词加入对话
       conversationHistory.push({
         role: "user",
         content: finalPrompt,
@@ -824,7 +824,7 @@ export class NoteGenerator {
       };
 
       try {
-        // 调用 LLM 生成最终总结（带自动 API 密钥轮换）
+        // 调用 LLM 生成最终summarize（带自动 API 密钥轮换）
         const summary = await LLMClient.chatWithRetry(
           pdfContent,
           isBase64,
@@ -836,22 +836,22 @@ export class NoteGenerator {
         const saveIntermediate =
           (getPref("multiSummarySaveIntermediate" as any) as boolean) ?? false;
         if (saveIntermediate) {
-          // 拼接中间内容和最终总结
+          // concatenate中间内容和最终summarize
           const intermediateContent = this.formatMultiRoundConcat(roundResults);
-          return `${intermediateContent}\n---\n\n# 📝 最终总结\n\n${summary}`;
+          return `${intermediateContent}\n---\n\n# 📝 最终summarize\n\n${summary}`;
         }
 
         return summary;
       } catch (error: any) {
-        ztoolkit.log("[AI Butler] 最终总结生成失败:", error);
-        // 如果最终总结失败，回退到拼接模式
+        ztoolkit.log("[AI Butler] 最终summarize生成失败:", error);
+        // 如果最终summarize失败，回退到concatenate模式
         return this.formatMultiRoundConcat(roundResults);
       }
     }
   }
 
   /**
-   * 格式化多轮对话拼接内容
+   * 格式化多轮对话concatenate内容
    *
    * @param roundResults 各轮对话结果
    * @returns 格式化后的 Markdown 内容
@@ -873,7 +873,7 @@ export class NoteGenerator {
   }
 
   /**
-   * 为多个文献条目批量生成 AI 总结笔记
+   * 为多个文献条目批量生成 AI summarize笔记
    *
    * 这是批量处理的核心函数,提供完整的用户交互和进度管理
    *
@@ -885,7 +885,7 @@ export class NoteGenerator {
    *
    * 处理流程:
    * 1. 创建并打开主窗口
-   * 2. 切换到 AI 总结视图
+   * 2. 切换到 AI summarize视图
    * 3. 设置用户停止回调
    * 4. 依次处理每个条目
    * 5. 实时更新进度和统计
@@ -934,7 +934,7 @@ export class NoteGenerator {
     const mainWindow = MainWindow.getInstance();
     await mainWindow.open("summary");
 
-    // 获取 AI 总结视图
+    // 获取 AI summarize视图
     const summaryView = mainWindow.getSummaryView();
     summaryView.updateQueueButton("ready");
 

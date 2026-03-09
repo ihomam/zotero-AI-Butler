@@ -13,10 +13,10 @@
  * 5. 子视图间的通信协调
  *
  * 子视图列表:
- * - DashboardView: 仪表盘概览
- * - SummaryView: AI 总结输出
- * - TaskQueueView: 任务队列管理
- * - SettingsView: 快捷设置面板
+ * - DashboardView: Dashboard概览
+ * - SummaryView: AI Summary输出
+ * - TaskQueueView: Task Queue管理
+ * - SettingsView: Settings面板
  *
  * 技术实现:
  * - 使用 ztoolkit.Dialog 创建对话框
@@ -86,13 +86,13 @@ export class MainWindow {
   /** 所有视图实例 */
   private views: Map<TabType, BaseView> = new Map();
 
-  /** 仪表盘视图 */
+  /** Dashboard视图 */
   private dashboardView: DashboardView;
 
-  /** AI 总结视图 */
+  /** AI Summary视图 */
   private summaryView: SummaryView;
 
-  /** 任务队列视图 */
+  /** Task Queue视图 */
   private taskQueueView: TaskQueueView;
 
   /** 设置视图 */
@@ -116,8 +116,8 @@ export class MainWindow {
     this.libraryScannerView = new LibraryScannerView();
     this.literatureReviewView = new LiteratureReviewView();
 
-    // 为总结视图设置默认的“返回任务队列”行为，避免未设置回调时按钮无效
-    // 当外部未覆盖回调时，点击按钮将直接切换到任务队列标签页
+    // 为总结视图设置默认的“返回Task Queue”行为，避免未设置回调时按钮无效
+    // 当外部未覆盖回调时，点击按钮将直接切换到Task Queue标签页
     this.summaryView.setQueueButtonHandler(() => {
       this.switchTab("tasks");
     });
@@ -267,7 +267,7 @@ export class MainWindow {
         ],
       })
       .setDialogData(dialogData)
-      .open("AI Butler - 智能文献管家", {
+      .open("AI Butler - Intelligent Literature Butler", {
         width: defaultW,
         height: defaultH,
         centerscreen: true,
@@ -406,10 +406,10 @@ export class MainWindow {
     if (!this.tabBar) return;
 
     const tabs: Array<{ id: TabType; label: string; icon: string }> = [
-      { id: "dashboard", label: "仪表盘", icon: "📊" },
-      { id: "summary", label: "AI 总结", icon: "📝" },
-      { id: "tasks", label: "任务队列", icon: "📋" },
-      { id: "settings", label: "快捷设置", icon: "⚙️" },
+      { id: "dashboard", label: "Dashboard", icon: "📊" },
+      { id: "summary", label: "AI Summary", icon: "📝" },
+      { id: "tasks", label: "Task Queue", icon: "📋" },
+      { id: "settings", label: "Settings", icon: "⚙️" },
     ];
 
     tabs.forEach((tab) => {
@@ -571,8 +571,8 @@ export class MainWindow {
 
     placeholderDiv.innerHTML = `
       <div style="font-size: 64px; margin-bottom: 20px;">🚧</div>
-      <div>该功能正在开发中...</div>
-      <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">敬请期待</div>
+      <div>This feature is under development...</div>
+      <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">Coming soon</div>
     `;
 
     this.viewContainer.appendChild(placeholderDiv);
@@ -621,27 +621,27 @@ export class MainWindow {
   }
 
   /**
-   * 获取仪表盘视图
+   * 获取Dashboard视图
    *
-   * @returns 仪表盘视图实例
+   * @returns Dashboard视图实例
    */
   public getDashboardView(): DashboardView {
     return this.dashboardView;
   }
 
   /**
-   * 获取 AI 总结视图
+   * 获取 AI Summary视图
    *
-   * @returns AI 总结视图实例
+   * @returns AI Summary视图实例
    */
   public getSummaryView(): SummaryView {
     return this.summaryView;
   }
 
   /**
-   * 获取任务队列视图
+   * 获取Task Queue视图
    *
-   * @returns 任务队列视图实例
+   * @returns Task Queue视图实例
    */
   public getTaskQueueView(): TaskQueueView {
     return this.taskQueueView;

@@ -43,11 +43,11 @@ export enum ButlerStatus {
  * 统计数据接口
  */
 export interface DashboardStats {
-  totalProcessed: number; // 总处理数
-  todayProcessed: number; // 今日处理数
-  pendingCount: number; // 待处理数
-  failedCount: number; // 失败数
-  successRate: number; // 成功率
+  totalProcessed: number; // Total Processed
+  todayProcessed: number; // Processed Today数
+  pendingCount: number; // Pending数
+  failedCount: number; // Failed
+  successRate: number; // Success Rate
   averageTime: number; // 平均处理时间(秒)
 }
 
@@ -228,7 +228,7 @@ export class DashboardView extends BaseView {
             borderBottom: "2px solid #59c0bc",
             paddingBottom: "10px",
           },
-          innerHTML: "📊 仪表盘",
+          innerHTML: "📊 Dashboard",
         }),
       ],
     });
@@ -268,7 +268,7 @@ export class DashboardView extends BaseView {
         fontWeight: "700",
         marginBottom: "10px",
       },
-      textContent: "AI 管家正在休息",
+      textContent: "AI Butler is resting",
     });
 
     const statusDetail = this.createElement("div", {
@@ -277,7 +277,7 @@ export class DashboardView extends BaseView {
         fontSize: "14px",
         opacity: "0.9",
       },
-      textContent: "管家已为您总结 0 篇文献",
+      textContent: "The Butler has summarized 0 papers for you",
     });
 
     card.appendChild(statusIcon);
@@ -302,12 +302,18 @@ export class DashboardView extends BaseView {
         gap: "15px",
       },
       children: [
-        this.createStatCard("total", "总处理数", "0", "#2196f3", "📚"),
-        this.createStatCard("today", "今日处理", "0", "#4caf50", "📅"),
-        this.createStatCard("pending", "待处理", "0", "#ff9800", "⏳"),
-        this.createStatCard("success-rate", "成功率", "100%", "#9c27b0", "✨"),
-        this.createStatCard("avg-time", "平均用时", "0s", "#607d8b", "⚡"),
-        this.createStatCard("failed", "失败数", "0", "#f44336", "❌"),
+        this.createStatCard("total", "Total Processed", "0", "#2196f3", "📚"),
+        this.createStatCard("today", "Processed Today", "0", "#4caf50", "📅"),
+        this.createStatCard("pending", "Pending", "0", "#ff9800", "⏳"),
+        this.createStatCard(
+          "success-rate",
+          "Success Rate",
+          "100%",
+          "#9c27b0",
+          "✨",
+        ),
+        this.createStatCard("avg-time", "Average Time", "0s", "#607d8b", "⚡"),
+        this.createStatCard("failed", "Failed", "0", "#f44336", "❌"),
       ],
     });
   }
@@ -353,7 +359,7 @@ export class DashboardView extends BaseView {
         fontSize: "16px",
         color: "var(--ai-text)",
       },
-      textContent: "⚡ 快捷操作",
+      textContent: "⚡ Quick Actions",
     });
 
     const actionsGrid = this.createElement("div", {
@@ -365,12 +371,12 @@ export class DashboardView extends BaseView {
     });
 
     const actions = [
-      { icon: "🔍", label: "扫描未分析论文", color: "#2196f3" },
-      { icon: "🚀", label: "开始自动扫描", color: "#4caf50" },
-      { icon: "⏸️", label: "暂停自动扫描", color: "#ff9800" },
-      { icon: "📋", label: "查看任务队列", color: "#9c27b0" },
-      { icon: "🗑️", label: "清除已完成", color: "#9e9e9e" },
-      { icon: "⚙️", label: "打开设置", color: "#607d8b" },
+      { icon: "🔍", label: "Scan Unanalyzed Papers", color: "#2196f3" },
+      { icon: "🚀", label: "Start Auto Scan", color: "#4caf50" },
+      { icon: "⏸️", label: "Pause Auto Scan", color: "#ff9800" },
+      { icon: "📋", label: "View Task Queue", color: "#9c27b0" },
+      { icon: "🗑️", label: "Clear Completed", color: "#9e9e9e" },
+      { icon: "⚙️", label: "Open Settings", color: "#607d8b" },
     ];
 
     actions.forEach((action) => {
@@ -412,7 +418,7 @@ export class DashboardView extends BaseView {
         fontSize: "16px",
         color: "var(--ai-text)",
       },
-      textContent: "🕒 最近活动",
+      textContent: "🕒 Recent Activity",
     });
 
     const activityList = this.createElement("div", {
@@ -434,7 +440,7 @@ export class DashboardView extends BaseView {
           color: "#9e9e9e",
           fontSize: "14px",
         },
-        textContent: "暂无最近活动",
+        textContent: "No recent activity",
       });
       activityList.appendChild(emptyMsg);
     }
@@ -470,26 +476,27 @@ export class DashboardView extends BaseView {
     switch (status) {
       case ButlerStatus.WORKING:
         statusIcon.textContent = "🧐";
-        statusText.textContent = "AI 管家正在废寝忘食地工作";
+        statusText.textContent = "AI Butler is working tirelessly";
         statusDetail.textContent = currentItem
-          ? `正在阅读: ${currentItem}${remaining ? ` (还剩 ${remaining} 篇)` : ""}`
-          : "正在处理文献...";
+          ? `Reading: ${currentItem}${remaining ? ` (${remaining} remaining)` : ""}`
+          : "Processing papers...";
         this.statusCard.style.background =
           "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)";
         break;
 
       case ButlerStatus.IDLE:
         statusIcon.textContent = "😴";
-        statusText.textContent = "AI 管家正在休息";
-        statusDetail.textContent = `管家已为您总结 ${this.stats.totalProcessed} 篇文献`;
+        statusText.textContent = "AI Butler is resting";
+        statusDetail.textContent = `The Butler has summarized ${this.stats.totalProcessed} papers for you`;
         this.statusCard.style.background =
           "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
         break;
 
       case ButlerStatus.ERROR:
         statusIcon.textContent = "😵";
-        statusText.textContent = "AI 管家遇到了问题";
-        statusDetail.textContent = "请检查配置或查看错误日志";
+        statusText.textContent = "AI Butler encountered a problem";
+        statusDetail.textContent =
+          "Please check the configuration or review the error log";
         this.statusCard.style.background =
           "linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)";
         break;
@@ -569,7 +576,7 @@ export class DashboardView extends BaseView {
           color: "#9e9e9e",
           fontSize: "14px",
         },
-        textContent: "暂无最近活动",
+        textContent: "No recent activity",
       });
       activityList.appendChild(emptyMsg);
       return;
@@ -658,10 +665,10 @@ export class DashboardView extends BaseView {
     const now = new Date();
     const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-    if (diff < 60) return "刚刚";
-    if (diff < 3600) return `${Math.floor(diff / 60)} 分钟前`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)} 小时前`;
-    if (diff < 604800) return `${Math.floor(diff / 86400)} 天前`;
+    if (diff < 60) return "Just now";
+    if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+    if (diff < 604800) return `${Math.floor(diff / 86400)} days ago`;
 
     return date.toLocaleDateString("zh-CN");
   }
@@ -675,48 +682,51 @@ export class DashboardView extends BaseView {
     ztoolkit.log(`[AI Butler] 快捷操作: ${action}`);
 
     switch (action) {
-      case "扫描未分析论文":
+      case "Scan Unanalyzed Papers":
         // 切换到库扫描视图
         MainWindow.getInstance().switchTab("scanner");
         break;
 
-      case "开始自动扫描":
+      case "Start Auto Scan":
         setPref("autoScan", true);
         AutoScanManager.getInstance().start();
         new ztoolkit.ProgressWindow("AI Butler")
-          .createLine({ text: "✅ 已启动自动扫描", type: "success" })
+          .createLine({ text: "✅ Auto scan started", type: "success" })
           .show();
         break;
 
-      case "暂停自动扫描":
+      case "Pause Auto Scan":
         setPref("autoScan", false);
         AutoScanManager.getInstance().stop();
         new ztoolkit.ProgressWindow("AI Butler")
-          .createLine({ text: "⏸️ 已暂停自动扫描", type: "default" })
+          .createLine({ text: "⏸️ Auto scan paused", type: "default" })
           .show();
         break;
 
-      case "查看任务队列":
+      case "View Task Queue":
         // 切换到任务队列标签页
         MainWindow.getInstance().switchTab("tasks");
         break;
 
-      case "清除已完成":
+      case "Clear Completed":
         this.taskQueueManager.clearCompleted();
         new ztoolkit.ProgressWindow("AI Butler")
-          .createLine({ text: "🗑️ 已清除已完成任务", type: "success" })
+          .createLine({ text: "🗑️ Completed tasks cleared", type: "success" })
           .show();
         this.refreshData();
         break;
 
-      case "打开设置":
+      case "Open Settings":
         // 切换到设置标签页
         MainWindow.getInstance().switchTab("settings");
         break;
 
       default:
         new ztoolkit.ProgressWindow("AI Butler")
-          .createLine({ text: `功能开发中: ${action}`, type: "default" })
+          .createLine({
+            text: `Feature under development: ${action}`,
+            type: "default",
+          })
           .show();
     }
   }
@@ -914,14 +924,17 @@ export class DashboardView extends BaseView {
       new ztoolkit.ProgressWindow("AI Butler", {
         closeTime: 3000,
       })
-        .createLine({ text: `✅ 已完成: ${task?.title}`, type: "success" })
+        .createLine({ text: `✅ Completed: ${task?.title}`, type: "success" })
         .show();
     } else {
       new ztoolkit.ProgressWindow("AI Butler", {
         closeTime: 5000,
       })
-        .createLine({ text: `❌ 处理失败: ${task?.title}`, type: "fail" })
-        .createLine({ text: error || "未知错误", type: "default" })
+        .createLine({
+          text: `❌ Processing failed: ${task?.title}`,
+          type: "fail",
+        })
+        .createLine({ text: error || "Unknown error", type: "default" })
         .show();
     }
   }

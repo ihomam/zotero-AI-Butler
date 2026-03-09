@@ -124,13 +124,13 @@ export class SettingsView extends BaseView {
 
     // 设置分类列表
     const categories = [
-      { id: "api" as SettingCategory, label: "🔌 API 配置" },
-      { id: "prompts" as SettingCategory, label: "📝 提示词模板" },
-      { id: "mindmap" as SettingCategory, label: "🧠 思维导图" },
-      { id: "imageSummary" as SettingCategory, label: "🖼️ 一图总结" },
-      { id: "ui" as SettingCategory, label: "🎨 界面设置" },
-      { id: "data" as SettingCategory, label: "💾 数据管理" },
-      { id: "about" as SettingCategory, label: "ℹ️ 关于" },
+      { id: "api" as SettingCategory, label: "🔌 API Configuration" },
+      { id: "prompts" as SettingCategory, label: "📝 Prompt Templates" },
+      { id: "mindmap" as SettingCategory, label: "🧠 Mind Map" },
+      { id: "imageSummary" as SettingCategory, label: "🖼️ Image Summary" },
+      { id: "ui" as SettingCategory, label: "🎨 UI Settings" },
+      { id: "data" as SettingCategory, label: "💾 Data Management" },
+      { id: "about" as SettingCategory, label: "ℹ️ About" },
     ];
 
     // 创建分类按钮
