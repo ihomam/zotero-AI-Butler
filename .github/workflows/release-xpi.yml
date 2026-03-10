@@ -1,0 +1,54 @@
+name: Build and Release XPI
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-xpi:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build addon
+        run: npm run build
+
+      - name: Find XPI
+        id: find_xpi
+        shell: bash
+        run: |
+          XPI_FILE="$(find . -type f -name '*.xpi' | head -n 1)"
+          if [ -z "$XPI_FILE" ]; then
+            echo "No .xpi file found after build"
+            exit 1
+          fi
+          echo "xpi=$XPI_FILE" >> "$GITHUB_OUTPUT"
+          echo "Found XPI: $XPI_FILE"
+
+      - name: Upload XPI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: zotero-addon-xpi
+          path: ${{ steps.find_xpi.outputs.xpi }}
+
+      - name: Upload XPI to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.find_xpi.outputs.xpi }}
